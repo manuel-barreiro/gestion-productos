@@ -13,6 +13,13 @@ import { useState } from "react"
 
 type Product = RouterOutputs["product"]["getProducts"][0]
 
+const formatDate = (date: Date) => {
+  return new Intl.DateTimeFormat("en-US", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(date)
+}
+
 const nameColumnFilterFn: FilterFn<Product> = (row, columnId, filterValue) => {
   const searchableRowContent = `${row.original.name}`.toLowerCase()
   const searchTerm = (filterValue ?? "").toLowerCase()
@@ -46,6 +53,24 @@ export const columns: ColumnDef<Product>[] = [
     size: 100,
     enableHiding: false,
     enableSorting: false,
+  },
+  {
+    header: "Created At",
+    accessorKey: "createdAt",
+    cell: ({ row }) => (
+      <div className="font-medium">{formatDate(row.getValue("createdAt"))}</div>
+    ),
+    size: 60,
+    enableHiding: true,
+  },
+  {
+    header: "Updated At",
+    accessorKey: "updatedAt",
+    cell: ({ row }) => (
+      <div className="font-medium">{formatDate(row.getValue("updatedAt"))}</div>
+    ),
+    size: 60,
+    enableHiding: true,
   },
 
   {

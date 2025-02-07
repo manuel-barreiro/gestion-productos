@@ -60,7 +60,7 @@ export default function CustomAvatar({ session }: { session: Session | null }) {
             className="opacity-60"
             aria-hidden="true"
           />
-          <span>Logout</span>
+          <span>Sign out</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
