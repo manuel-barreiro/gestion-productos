@@ -1,28 +1,26 @@
+"use client"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { signOut } from "@/server/auth"
+import { signOut } from "next-auth/react"
 
-import {
-  Bolt,
-  BookOpen,
-  ChevronDown,
-  Layers2,
-  LogOut,
-  Pin,
-  UserPen,
-} from "lucide-react"
+import { ChevronDown, LogOut } from "lucide-react"
 import { Session } from "next-auth"
 
 export default function CustomAvatar({ session }: { session: Session | null }) {
+  const handleSignOut = async () => {
+    await signOut({
+      redirectTo: "/sign-in",
+    })
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -54,59 +52,8 @@ export default function CustomAvatar({ session }: { session: Session | null }) {
             {session?.user.email}
           </span>
         </DropdownMenuLabel>
-        {/* <DropdownMenuSeparator /> */}
-        {/* <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <Bolt
-              size={16}
-              strokeWidth={2}
-              className="opacity-60"
-              aria-hidden="true"
-            />
-            <span>Option 1</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Layers2
-              size={16}
-              strokeWidth={2}
-              className="opacity-60"
-              aria-hidden="true"
-            />
-            <span>Option 2</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <BookOpen
-              size={16}
-              strokeWidth={2}
-              className="opacity-60"
-              aria-hidden="true"
-            />
-            <span>Option 3</span>
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <Pin
-              size={16}
-              strokeWidth={2}
-              className="opacity-60"
-              aria-hidden="true"
-            />
-            <span>Option 4</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <UserPen
-              size={16}
-              strokeWidth={2}
-              className="opacity-60"
-              aria-hidden="true"
-            />
-            <span>Option 5</span>
-          </DropdownMenuItem>
-        </DropdownMenuGroup> */}
-        <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={handleSignOut}>
           <LogOut
             size={16}
             strokeWidth={2}
