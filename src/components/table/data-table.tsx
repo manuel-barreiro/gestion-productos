@@ -49,8 +49,8 @@ import {
 } from "lucide-react"
 import { useId, useRef, useState } from "react"
 import { columns } from "./columns"
-import { api } from "@/trpc/react"
 import { type RouterOutputs } from "@/trpc/react"
+import { ProductDialog } from "../products/product-dialog"
 
 type Product = RouterOutputs["product"]["getProducts"][0]
 
@@ -66,10 +66,12 @@ export default function DataTable({ products }: { products: Product[] }) {
 
   const [sorting, setSorting] = useState<SortingState>([
     {
-      id: "name",
+      id: "id",
       desc: false,
     },
   ])
+
+  const [dialogOpen, setDialogOpen] = useState(false)
 
   // Table instance
   const table = useReactTable({
@@ -94,7 +96,7 @@ export default function DataTable({ products }: { products: Product[] }) {
   })
 
   return (
-    <div className="mx-auto max-w-2xl space-y-4">
+    <div className="max-w-2xl space-y-4">
       {/* Filters */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
@@ -174,14 +176,20 @@ export default function DataTable({ products }: { products: Product[] }) {
         </div>
         <div className="flex items-center gap-3">
           {/* Add user button */}
-          <Button className="ml-auto" variant="outline">
+          <Button
+            className="ml-auto"
+            variant="outline"
+            onClick={() => {
+              setDialogOpen(true)
+            }}
+          >
             <Plus
               className="-ms-1 me-2 opacity-60"
               size={16}
               strokeWidth={2}
               aria-hidden="true"
             />
-            Add product
+            New product
           </Button>
         </div>
       </div>
@@ -397,6 +405,12 @@ export default function DataTable({ products }: { products: Product[] }) {
           </Pagination>
         </div>
       </div>
+
+      <ProductDialog
+        mode={"create"}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+      />
     </div>
   )
 }

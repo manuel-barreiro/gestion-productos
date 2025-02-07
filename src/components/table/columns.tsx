@@ -2,19 +2,14 @@ import { ColumnDef, FilterFn, Row } from "@tanstack/react-table"
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuPortal,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "../ui/button"
 import { Ellipsis, Eye, Pencil, Trash } from "lucide-react"
 import { type RouterOutputs } from "@/trpc/react"
+import { ProductDialog } from "../products/product-dialog"
+import { useState } from "react"
 
 type Product = RouterOutputs["product"]["getProducts"][0]
 
@@ -63,39 +58,62 @@ export const columns: ColumnDef<Product>[] = [
 ]
 
 function RowActions({ row }: { row: Row<Product> }) {
+  const [open, setOpen] = useState(false)
+  const [mode, setMode] = useState<"view" | "edit" | "delete">("view")
+
+  const handleAction = (actionMode: "view" | "edit" | "delete") => {
+    setMode(actionMode)
+    setOpen(true)
+  }
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <div className="flex justify-end">
-          <Button
-            size="icon"
-            variant="ghost"
-            className="shadow-none"
-            aria-label="Edit item"
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <div className="flex justify-end">
+            <Button
+              size="icon"
+              variant="ghost"
+              className="shadow-none"
+              aria-label="Edit item"
+            >
+              <Ellipsis size={16} strokeWidth={2} aria-hidden="true" />
+            </Button>
+          </div>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem
+            className="flex justify-between"
+            onSelect={() => handleAction("view")}
           >
-            <Ellipsis size={16} strokeWidth={2} aria-hidden="true" />
-          </Button>
-        </div>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem className="flex justify-between">
-          <span>View</span>
+            <span>View</span>
+            <Eye size={16} strokeWidth={2} />
+          </DropdownMenuItem>
 
-          <Eye size={16} strokeWidth={2} />
-        </DropdownMenuItem>
+          <DropdownMenuItem
+            className="flex justify-between"
+            onSelect={() => handleAction("edit")}
+          >
+            <span>Edit</span>
+            <Pencil size={16} strokeWidth={2} />
+          </DropdownMenuItem>
 
-        <DropdownMenuItem className="flex justify-between">
-          <span>Edit</span>
+          <DropdownMenuItem
+            className="flex justify-between text-destructive focus:text-destructive"
+            onSelect={() => handleAction("delete")}
+          >
+            <span>Delete</span>
+            <Trash size={16} strokeWidth={2} />
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
 
-          <Pencil size={16} strokeWidth={2} />
-        </DropdownMenuItem>
-
-        <DropdownMenuItem className="flex justify-between text-destructive focus:text-destructive">
-          <span>Delete</span>
-
-          <Trash size={16} strokeWidth={2} />
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+      <ProductDialog
+        product={row.original}
+        mode={mode}
+        open={open}
+        onOpenChange={setOpen}
+      />
+    </>
   )
 }

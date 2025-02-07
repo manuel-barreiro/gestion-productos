@@ -7,14 +7,6 @@ import {
 } from "@/server/api/trpc"
 
 export const productRouter = createTRPCRouter({
-  hello: publicProcedure
-    .input(z.object({ text: z.string() }))
-    .query(({ input }) => {
-      return {
-        greeting: `Hello ${input.text}`,
-      }
-    }),
-
   create: protectedProcedure
     .input(
       z.object({ name: z.string().min(1), ingredients: z.string().min(1) })
@@ -26,6 +18,30 @@ export const productRouter = createTRPCRouter({
           ingredients: input.ingredients,
           createdBy: { connect: { id: ctx.session.user.id } },
         },
+      })
+    }),
+
+  update: protectedProcedure
+    .input(
+      z.object({
+        id: z.number(),
+        name: z.string().min(1),
+        ingredients: z.string().min(1),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { id, ...data } = input
+      return ctx.db.product.update({
+        where: { id },
+        data,
+      })
+    }),
+
+  delete: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.product.delete({
+        where: { id: input.id },
       })
     }),
 
@@ -44,9 +60,5 @@ export const productRouter = createTRPCRouter({
     })
 
     return products ?? null
-  }),
-
-  getSecretMessage: protectedProcedure.query(() => {
-    return "you can now see this secret message!"
   }),
 })
