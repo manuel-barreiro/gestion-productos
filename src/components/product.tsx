@@ -1,35 +1,37 @@
-"use client";
+"use client"
 
-import { useState } from "react";
+import { useState } from "react"
 
-import { api } from "@/trpc/react";
+import { api } from "@/trpc/react"
 
 export function LatestProduct() {
-  const [latestProduct] = api.product.getLatest.useSuspenseQuery();
+  const [latestProduct] = api.product.getLatest.useSuspenseQuery()
 
-  const utils = api.useUtils();
-  const [name, setName] = useState("");
-  const [ingredients, setIngredients] = useState("");
+  const utils = api.useUtils()
+  const [name, setName] = useState("")
+  const [ingredients, setIngredients] = useState("")
 
   const createProduct = api.product.create.useMutation({
     onSuccess: async () => {
-      await utils.product.invalidate();
-      setName("");
-      setIngredients("");
+      await utils.product.invalidate()
+      setName("")
+      setIngredients("")
     },
-  });
+  })
 
   return (
     <div className="w-full max-w-xs">
       {latestProduct ? (
-        <p className="truncate">Your most recent product: {latestProduct.name}</p>
+        <p className="truncate">
+          Your most recent product: {latestProduct.name}
+        </p>
       ) : (
         <p>You have no products yet.</p>
       )}
       <form
         onSubmit={(e) => {
-          e.preventDefault();
-          createProduct.mutate({ name, ingredients });
+          e.preventDefault()
+          createProduct.mutate({ name, ingredients })
         }}
         className="flex flex-col gap-2"
       >
@@ -56,5 +58,5 @@ export function LatestProduct() {
         </button>
       </form>
     </div>
-  );
+  )
 }
