@@ -44,13 +44,22 @@ import {
   ChevronRight,
   ChevronUp,
   CircleX,
+  Columns3,
   ListFilter,
   Plus,
+  SlidersHorizontal,
 } from "lucide-react"
 import { useId, useRef, useState } from "react"
 import { columns } from "./columns"
 import { type RouterOutputs } from "@/trpc/react"
 import { ProductDialog } from "../products/product-dialog"
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu"
 
 type Product = RouterOutputs["product"]["getProducts"][0]
 
@@ -66,7 +75,7 @@ export default function DataTable({ products }: { products: Product[] }) {
 
   const [sorting, setSorting] = useState<SortingState>([
     {
-      id: "id",
+      id: "name",
       desc: false,
     },
   ])
@@ -139,10 +148,10 @@ export default function DataTable({ products }: { products: Product[] }) {
           </div>
 
           {/* Toggle columns visibility */}
-          {/* <DropdownMenu>
+          <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline">
-                <Columns3
+                <SlidersHorizontal
                   className="-ms-1 me-2 opacity-60"
                   size={16}
                   strokeWidth={2}
@@ -172,7 +181,7 @@ export default function DataTable({ products }: { products: Product[] }) {
                   )
                 })}
             </DropdownMenuContent>
-          </DropdownMenu> */}
+          </DropdownMenu>
         </div>
         <div className="flex items-center gap-3">
           {/* Add user button */}

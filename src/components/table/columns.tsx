@@ -10,12 +10,14 @@ import { Ellipsis, Eye, Pencil, Trash } from "lucide-react"
 import { type RouterOutputs } from "@/trpc/react"
 import { ProductDialog } from "../products/product-dialog"
 import { useState } from "react"
+import { QRCodeSVG } from "qrcode.react"
+import Link from "next/link"
 
 type Product = RouterOutputs["product"]["getProducts"][0]
 
 const formatDate = (date: Date) => {
   return new Intl.DateTimeFormat("en-US", {
-    dateStyle: "medium",
+    dateStyle: "short",
     timeStyle: "short",
   }).format(date)
 }
@@ -55,7 +57,26 @@ export const columns: ColumnDef<Product>[] = [
     enableSorting: false,
   },
   {
-    header: "Created At",
+    header: "QR Code",
+    id: "qrcode",
+    cell: ({ row }) => (
+      <Link href={`/product/${row.getValue("id")}`}>
+        <div className="inline-block rounded-md bg-white p-1">
+          <QRCodeSVG
+            value={`${window.location.origin}/product/${row.getValue("id")}`}
+            size={60}
+            bgColor="#FFFFFF"
+            fgColor="#000000"
+          />
+        </div>
+      </Link>
+    ),
+    size: 60,
+    enableHiding: true,
+    enableSorting: false,
+  },
+  {
+    header: "Created",
     accessorKey: "createdAt",
     cell: ({ row }) => (
       <div className="font-medium">{formatDate(row.getValue("createdAt"))}</div>
@@ -64,7 +85,7 @@ export const columns: ColumnDef<Product>[] = [
     enableHiding: true,
   },
   {
-    header: "Updated At",
+    header: "Updated",
     accessorKey: "updatedAt",
     cell: ({ row }) => (
       <div className="font-medium">{formatDate(row.getValue("updatedAt"))}</div>
