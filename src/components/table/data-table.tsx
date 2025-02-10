@@ -105,7 +105,7 @@ export default function DataTable({ products }: { products: Product[] }) {
   })
 
   return (
-    <div className="max-w-2xl space-y-4">
+    <div className="w-full max-w-5xl space-y-4">
       {/* Filters */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
@@ -204,9 +204,10 @@ export default function DataTable({ products }: { products: Product[] }) {
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-lg border border-border bg-background">
-        <Table className="table-fixed">
-          <TableHeader>
+      <div className="w-full overflow-x-auto [&>div]:max-h-96">
+        {" "}
+        <Table className="border-separate border-spacing-0 [&_td]:border-border [&_tfoot_td]:border-t [&_th]:border-b [&_th]:border-border [&_tr:not(:last-child)_td]:border-b [&_tr]:border-none">
+          <TableHeader className="sticky top-0 z-10 bg-background/90 backdrop-blur-sm">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id} className="hover:bg-transparent">
                 {headerGroup.headers.map((header) => {
@@ -276,6 +277,7 @@ export default function DataTable({ products }: { products: Product[] }) {
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  className="border-none odd:bg-muted/50 hover:bg-transparent odd:hover:bg-muted/50"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id} className="last:py-0">

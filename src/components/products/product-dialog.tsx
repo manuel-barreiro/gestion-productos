@@ -26,6 +26,8 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { type RouterOutputs } from "@/trpc/react"
+import { RichTextEditor } from "./rich-text-editor"
+import { MinimalTiptapEditor } from "../minimal-tiptap"
 import { cn } from "@/lib/utils"
 
 type Product = RouterOutputs["product"]["getProducts"][0]
@@ -37,7 +39,7 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>
 
-type Mode = "create" | "view" | "edit" | "delete"
+type Mode = "create" | "edit" | "delete"
 
 interface ProductDialogProps {
   product?: Product // Make product optional since create mode won't have one
@@ -53,7 +55,6 @@ export function ProductDialog({
   onOpenChange,
 }: ProductDialogProps) {
   const router = useRouter()
-  const isViewMode = mode === "view"
   const isDeleteMode = mode === "delete"
   const isCreateMode = mode === "create"
 
@@ -92,7 +93,6 @@ export function ProductDialog({
   })
 
   function onSubmit(data: FormValues) {
-    if (isViewMode) return
     if (isCreateMode) {
       createProduct.mutate(data)
     } else {
@@ -113,25 +113,21 @@ export function ProductDialog({
         onOpenChange(isOpen)
       }}
     >
-      <DialogContent>
+      <DialogContent className="overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {isDeleteMode
               ? `Delete ${product?.name}`
-              : isViewMode
-                ? "View product"
-                : isCreateMode
-                  ? "Create new product"
-                  : "Edit product"}
+              : isCreateMode
+                ? "Create new product"
+                : "Edit product"}
           </DialogTitle>
           <DialogDescription>
             {isDeleteMode
               ? "This action cannot be undone."
-              : isViewMode
-                ? "Product details"
-                : isCreateMode
-                  ? "Add a new product to your inventory"
-                  : "Make changes to this product"}
+              : isCreateMode
+                ? "Add a new product to your inventory"
+                : "Make changes to this product"}
           </DialogDescription>
         </DialogHeader>
 
@@ -162,18 +158,13 @@ export function ProductDialog({
                   <FormItem>
                     <FormLabel>Name</FormLabel>
                     <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="Product name"
-                        disabled={isViewMode}
-                        readOnly={isViewMode}
-                      />
+                      <Input {...field} placeholder="Product name" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-
+              {/* <RichTextEditor /> */}
               <FormField
                 control={form.control}
                 name="ingredients"
@@ -181,34 +172,38 @@ export function ProductDialog({
                   <FormItem>
                     <FormLabel>Ingredients</FormLabel>
                     <FormControl>
-                      <Textarea
+                      <MinimalTiptapEditor
                         {...field}
-                        placeholder="List the ingredients..."
-                        disabled={isViewMode}
-                        readOnly={isViewMode}
+                        throttleDelay={0}
+                        className={cn("", {
+                          "border-destructive focus-within:border-destructive":
+                            form.formState.errors.ingredients,
+                        })}
+                        editorContentClassName="overflow-auto h-full flex grow"
+                        output="html"
+                        placeholder="Type your description here..."
+                        editable={true}
+                        editorClassName="focus:outline-none px-5 py-4 h-full grow"
                       />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-
-              {!isViewMode && (
-                <DialogFooter>
-                  <Button
-                    type="submit"
-                    disabled={(!isDirty && !isCreateMode) || isPending}
-                  >
-                    {isPending
-                      ? isCreateMode
-                        ? "Creating..."
-                        : "Saving..."
-                      : isCreateMode
-                        ? "Create product"
-                        : "Save changes"}
-                  </Button>
-                </DialogFooter>
-              )}
+              <DialogFooter>
+                <Button
+                  type="submit"
+                  disabled={(!isDirty && !isCreateMode) || isPending}
+                >
+                  {isPending
+                    ? isCreateMode
+                      ? "Creating..."
+                      : "Saving..."
+                    : isCreateMode
+                      ? "Create product"
+                      : "Save changes"}
+                </Button>
+              </DialogFooter>
             </form>
           </Form>
         )}

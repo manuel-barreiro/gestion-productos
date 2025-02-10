@@ -67,7 +67,17 @@ export const productRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const product = await ctx.db.product.findUnique({
         where: { id: input.id },
+        include: {
+          createdBy: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+            },
+          },
+        },
       })
+      console.log(product)
 
       if (!product) return null
       return product
