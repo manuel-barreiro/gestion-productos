@@ -77,7 +77,6 @@ export const productRouter = createTRPCRouter({
           },
         },
       })
-      console.log(product)
 
       if (!product) return null
       return product

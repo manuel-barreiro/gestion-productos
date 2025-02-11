@@ -13,16 +13,12 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { type Metadata } from "next"
 
-interface ProductPageProps {
-  params: {
-    id: string
-  }
-  searchParams: { [key: string]: string | string[] | undefined }
-}
-
-export default async function ProductPage({ params }: ProductPageProps) {
+export default async function ProductPage({
+  params,
+}: {
+  params: { id: string }
+}) {
   const session = await auth()
   const product = await api.product.getById({ id: Number(params.id) })
 
