@@ -27,6 +27,7 @@ import { type RouterOutputs } from "@/trpc/react"
 import { MinimalTiptapEditor } from "../minimal-tiptap"
 import { cn } from "@/lib/utils"
 import { LoaderCircle } from "lucide-react"
+import { useEffect } from "react"
 
 type Product = RouterOutputs["product"]["getProducts"][0]
 
@@ -58,12 +59,19 @@ export function ProductDialog({
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    values: {
-      // Use values instead of defaultValues
+    defaultValues: {
       name: product?.name ?? "",
       ingredients: product?.ingredients ?? "",
     },
   })
+
+  // Reset form when product changes
+  useEffect(() => {
+    form.reset({
+      name: product?.name ?? "",
+      ingredients: product?.ingredients ?? "",
+    })
+  }, [product, form])
 
   const { isDirty } = form.formState
 
@@ -169,7 +177,6 @@ export function ProductDialog({
                   </FormItem>
                 )}
               />
-              {/* <RichTextEditor /> */}
               <FormField
                 control={form.control}
                 name="ingredients"
@@ -196,6 +203,17 @@ export function ProductDialog({
                 )}
               />
               <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    form.reset()
+                    onOpenChange(false)
+                  }}
+                  disabled={!isDirty || isPending}
+                >
+                  Discard
+                </Button>
                 <Button
                   type="submit"
                   disabled={(!isDirty && !isCreateMode) || isPending}

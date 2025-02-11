@@ -33,6 +33,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { useToast } from "@/components/ui/hooks/use-toast"
+import { useEffect } from "react" // Add this import
 
 type User = RouterOutputs["user"]["getAll"][0]
 
@@ -70,7 +71,7 @@ export function UserDialog({
 
   const form = useForm<CreateFormValues | EditFormValues>({
     resolver: zodResolver(isCreateMode ? createFormSchema : editFormSchema),
-    values: isCreateMode
+    defaultValues: isCreateMode
       ? {
           name: "",
           email: "",
@@ -83,6 +84,24 @@ export function UserDialog({
           role: (user?.role ?? "USER") as "ADMIN" | "USER",
         },
   })
+
+  // Reset form when user changes
+  useEffect(() => {
+    form.reset(
+      isCreateMode
+        ? {
+            name: "",
+            email: "",
+            password: "",
+            role: "USER",
+          }
+        : {
+            name: user?.name ?? "",
+            email: user?.email ?? "",
+            role: (user?.role ?? "USER") as "ADMIN" | "USER",
+          }
+    )
+  }, [user, form, isCreateMode])
 
   const { isDirty } = form.formState
 
@@ -283,6 +302,17 @@ export function UserDialog({
                 )}
               />
               <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    form.reset()
+                    onOpenChange(false)
+                  }}
+                  disabled={!isDirty || isPending}
+                >
+                  Discard
+                </Button>
                 <Button
                   type="submit"
                   disabled={(!isDirty && !isCreateMode) || isPending}

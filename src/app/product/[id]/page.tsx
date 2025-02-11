@@ -34,7 +34,7 @@ export default async function ProductPage({
 
   return (
     <main className="container mx-auto mt-4 max-w-5xl">
-      <Card className="overflow-hidden">
+      <Card className="overflow-hidden border-0 sm:border">
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="text-2xl font-bold">{product.name}</CardTitle>
