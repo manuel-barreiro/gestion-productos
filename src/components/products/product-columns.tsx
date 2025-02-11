@@ -60,7 +60,12 @@ export const columns: ColumnDef<Product>[] = [
     id: "qrcode",
     cell: ({ row }) => (
       <div className="inline-block rounded-md bg-white p-1">
-        <QRCode path={`/product/${row.getValue("id")}`} size={60} />
+        <QRCode
+          path={`/product/${row.getValue("id")}`}
+          size={80}
+          showActions={false}
+          containerClassName="bg-transparent p-0 border-0 shadow-none"
+        />
       </div>
     ),
     size: 60,

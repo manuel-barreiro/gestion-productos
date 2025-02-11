@@ -9,9 +9,17 @@ interface QRCodeProps {
   path: string
   size?: number
   className?: string
+  showActions?: boolean
+  containerClassName?: string
 }
 
-export function QRCode({ path, size = 200, className }: QRCodeProps) {
+export function QRCode({
+  path,
+  size = 200,
+  className,
+  showActions = true,
+  containerClassName = "rounded-lg border bg-white p-4 shadow-sm",
+}: QRCodeProps) {
   const [url, setUrl] = useState(path)
   const [copied, setCopied] = useState(false)
   const [downloaded, setDownloaded] = useState(false)
@@ -66,7 +74,7 @@ export function QRCode({ path, size = 200, className }: QRCodeProps) {
 
     timeoutRef.current = setTimeout(() => {
       type === "copy" ? setCopied(false) : setDownloaded(false)
-    }, 20000)
+    }, 2000)
   }
 
   const downloadQRCode = async () => {
@@ -99,7 +107,7 @@ export function QRCode({ path, size = 200, className }: QRCodeProps) {
 
   return (
     <div className={`flex flex-col items-center gap-4 ${className}`}>
-      <div className="rounded-lg border bg-white p-4 shadow-sm">
+      <div className={containerClassName}>
         <QRCodeSVG
           ref={qrRef}
           value={url}
@@ -111,49 +119,51 @@ export function QRCode({ path, size = 200, className }: QRCodeProps) {
         />
       </div>
 
-      <div className="flex gap-2">
-        <Button
-          onClick={downloadQRCode}
-          variant="outline"
-          size="sm"
-          className="relative w-32 overflow-hidden transition-all"
-        >
-          <div className="flex items-center gap-2">
-            {downloaded ? (
-              <>
-                <Check className="h-4 w-4 text-green-600 animate-in zoom-in-50" />
-                <span className="text-green-600">Downloaded!</span>
-              </>
-            ) : (
-              <>
-                <Download className="h-4 w-4" />
-                <span>Download</span>
-              </>
-            )}
-          </div>
-        </Button>
+      {showActions && (
+        <div className="flex gap-2">
+          <Button
+            onClick={downloadQRCode}
+            variant="outline"
+            size="sm"
+            className="relative w-32 overflow-hidden transition-all"
+          >
+            <div className="flex items-center gap-2">
+              {downloaded ? (
+                <>
+                  <Check className="h-4 w-4 text-green-600 animate-in zoom-in-50" />
+                  <span className="text-green-600">Downloaded!</span>
+                </>
+              ) : (
+                <>
+                  <Download className="h-4 w-4" />
+                  <span>Download</span>
+                </>
+              )}
+            </div>
+          </Button>
 
-        <Button
-          onClick={copyQRCode}
-          variant="outline"
-          size="sm"
-          className="relative w-32 overflow-hidden transition-all"
-        >
-          <div className="flex items-center gap-2">
-            {copied ? (
-              <>
-                <Check className="h-4 w-4 text-green-600 animate-in zoom-in-50" />
-                <span className="text-green-600">Copied!</span>
-              </>
-            ) : (
-              <>
-                <Copy className="h-4 w-4" />
-                <span>Copy</span>
-              </>
-            )}
-          </div>
-        </Button>
-      </div>
+          <Button
+            onClick={copyQRCode}
+            variant="outline"
+            size="sm"
+            className="relative w-32 overflow-hidden transition-all"
+          >
+            <div className="flex items-center gap-2">
+              {copied ? (
+                <>
+                  <Check className="h-4 w-4 text-green-600 animate-in zoom-in-50" />
+                  <span className="text-green-600">Copied!</span>
+                </>
+              ) : (
+                <>
+                  <Copy className="h-4 w-4" />
+                  <span>Copy</span>
+                </>
+              )}
+            </div>
+          </Button>
+        </div>
+      )}
     </div>
   )
 }

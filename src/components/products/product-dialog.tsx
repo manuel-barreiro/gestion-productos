@@ -94,7 +94,7 @@ export function ProductDialog({
     if (isCreateMode) {
       createProduct.mutate(data)
     } else {
-      updateProduct.mutate({ id: product!.id, ...data })
+      updateProduct.mutate({ id: product!.id, data })
     }
   }
 
