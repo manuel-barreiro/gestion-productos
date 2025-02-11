@@ -9,6 +9,7 @@ import { TooltipProvider } from "@/components/ui/tooltip"
 import { Navbar } from "@/components/NavBar"
 import { auth } from "@/server/auth"
 import { SessionProvider } from "next-auth/react"
+import { Toaster } from "@/components/ui/toaster"
 
 export const metadata: Metadata = {
   title: "gestion-productos",
@@ -38,6 +39,7 @@ export default async function RootLayout({
               <TooltipProvider>
                 <Navbar />
                 {children}
+                <Toaster />
               </TooltipProvider>
             </ThemeProvider>
           </SessionProvider>
