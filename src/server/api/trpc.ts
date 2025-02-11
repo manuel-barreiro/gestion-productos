@@ -101,6 +101,16 @@ const timingMiddleware = t.middleware(async ({ next, path }) => {
   return result
 })
 
+export const enforceUserIsAdmin = t.middleware(async ({ ctx, next }) => {
+  if (ctx.session?.user?.role !== "ADMIN") {
+    throw new TRPCError({
+      code: "UNAUTHORIZED",
+      message: "You must be an administrator to perform this action",
+    })
+  }
+  return next()
+})
+
 /**
  * Public (unauthenticated) procedure
  *
@@ -131,3 +141,5 @@ export const protectedProcedure = t.procedure
       },
     })
   })
+
+export const adminProcedure = protectedProcedure.use(enforceUserIsAdmin)

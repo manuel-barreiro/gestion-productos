@@ -10,6 +10,7 @@ import { Ellipsis, Pencil, Trash } from "lucide-react"
 import { UserDialog } from "./user-dialog"
 import { useState } from "react"
 import { type RouterOutputs } from "@/trpc/react"
+import { Authorize } from "@/components/authorize"
 
 type User = RouterOutputs["user"]["getAll"][0]
 
@@ -23,7 +24,7 @@ export function UserActions({ user }: { user: User }) {
   }
 
   return (
-    <>
+    <Authorize roles={["ADMIN"]}>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <div className="flex justify-end">
@@ -57,6 +58,6 @@ export function UserActions({ user }: { user: User }) {
       </DropdownMenu>
 
       <UserDialog user={user} mode={mode} open={open} onOpenChange={setOpen} />
-    </>
+    </Authorize>
   )
 }

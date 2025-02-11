@@ -1,65 +1,30 @@
 import { z } from "zod"
-
 import {
+  adminProcedure,
   createTRPCRouter,
   protectedProcedure,
-  publicProcedure,
 } from "@/server/api/trpc"
+import { TRPCError } from "@trpc/server"
+
+const productSchema = z.object({
+  name: z.string().min(1),
+  ingredients: z.string(),
+  // Add other product fields as needed
+})
 
 export const productRouter = createTRPCRouter({
-  create: protectedProcedure
-    .input(
-      z.object({ name: z.string().min(1), ingredients: z.string().min(1) })
-    )
-    .mutation(async ({ ctx, input }) => {
-      return ctx.db.product.create({
-        data: {
-          name: input.name,
-          ingredients: input.ingredients,
-          createdBy: { connect: { id: ctx.session.user.id } },
-        },
-      })
-    }),
-
-  update: protectedProcedure
-    .input(
-      z.object({
-        id: z.number(),
-        name: z.string().min(1),
-        ingredients: z.string().min(1),
-      })
-    )
-    .mutation(async ({ ctx, input }) => {
-      const { id, ...data } = input
-      return ctx.db.product.update({
-        where: { id },
-        data,
-      })
-    }),
-
-  delete: protectedProcedure
-    .input(z.object({ id: z.number() }))
-    .mutation(async ({ ctx, input }) => {
-      return ctx.db.product.delete({
-        where: { id: input.id },
-      })
-    }),
-
-  getLatest: protectedProcedure.query(async ({ ctx }) => {
-    const product = await ctx.db.product.findFirst({
-      orderBy: { createdAt: "desc" },
-      where: { createdBy: { id: ctx.session.user.id } },
-    })
-
-    return product ?? null
-  }),
-
+  // Public procedures - Available to all authenticated users
   getProducts: protectedProcedure.query(async ({ ctx }) => {
-    const products = await ctx.db.product.findMany({
-      orderBy: { createdAt: "desc" },
+    return ctx.db.product.findMany({
+      orderBy: { name: "asc" },
+      include: {
+        createdBy: {
+          select: {
+            name: true,
+          },
+        },
+      },
     })
-
-    return products ?? null
   }),
 
   getById: protectedProcedure
@@ -70,15 +35,80 @@ export const productRouter = createTRPCRouter({
         include: {
           createdBy: {
             select: {
-              id: true,
               name: true,
-              image: true,
             },
           },
         },
       })
 
-      if (!product) return null
+      if (!product) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Product not found",
+        })
+      }
+
       return product
+    }),
+
+  // Admin-only procedures
+  create: adminProcedure
+    .input(productSchema)
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.product.create({
+        data: {
+          ...input,
+          createdById: ctx.session.user.id,
+        },
+      })
+    }),
+
+  update: adminProcedure
+    .input(
+      z.object({
+        id: z.number(),
+        data: productSchema.partial(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { id, data } = input
+
+      const product = await ctx.db.product.findUnique({
+        where: { id },
+      })
+
+      if (!product) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Product not found",
+        })
+      }
+
+      return ctx.db.product.update({
+        where: { id },
+        data: {
+          ...data,
+          updatedAt: new Date(),
+        },
+      })
+    }),
+
+  delete: adminProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const product = await ctx.db.product.findUnique({
+        where: { id: input.id },
+      })
+
+      if (!product) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Product not found",
+        })
+      }
+
+      return ctx.db.product.delete({
+        where: { id: input.id },
+      })
     }),
 })

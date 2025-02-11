@@ -1,41 +1,25 @@
 import { z } from "zod"
-import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc"
+import { adminProcedure, createTRPCRouter } from "@/server/api/trpc"
 import { TRPCError } from "@trpc/server"
 import { hash } from "bcryptjs"
 
-// Middleware to check if user is admin
-const adminMiddleware = (ctx: any) => {
-  if (ctx.session?.user?.role !== "ADMIN") {
-    throw new TRPCError({ code: "UNAUTHORIZED", message: "Must be admin" })
-  }
-}
-
 export const userRouter = createTRPCRouter({
   // Get all users
-  getAll: protectedProcedure
-    .use(async ({ ctx, next }) => {
-      adminMiddleware(ctx)
-      return next()
+  getAll: adminProcedure.query(async ({ ctx }) => {
+    return ctx.db.user.findMany({
+      orderBy: { name: "desc" },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        image: true,
+      },
     })
-    .query(async ({ ctx }) => {
-      return ctx.db.user.findMany({
-        orderBy: { name: "desc" },
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          role: true,
-          image: true,
-        },
-      })
-    }),
+  }),
 
   // Create new user
-  create: protectedProcedure
-    .use(async ({ ctx, next }) => {
-      adminMiddleware(ctx)
-      return next()
-    })
+  create: adminProcedure
     .input(
       z.object({
         name: z.string().min(1),
@@ -68,11 +52,7 @@ export const userRouter = createTRPCRouter({
     }),
 
   // Update user - now with optional password update
-  update: protectedProcedure
-    .use(async ({ ctx, next }) => {
-      adminMiddleware(ctx)
-      return next()
-    })
+  update: adminProcedure
     .input(
       z.object({
         id: z.string(),
@@ -97,11 +77,7 @@ export const userRouter = createTRPCRouter({
     }),
 
   // Delete user
-  delete: protectedProcedure
-    .use(async ({ ctx, next }) => {
-      adminMiddleware(ctx)
-      return next()
-    })
+  delete: adminProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
       return ctx.db.user.delete({

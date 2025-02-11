@@ -57,6 +57,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Authorize } from "@/components/authorize"
 
 interface DataTableProps<TData> {
   data: TData[]
@@ -192,17 +193,23 @@ export default function DataTable<TData>({
           </DropdownMenu>
         </div>
         {onNewClick && (
-          <div className="flex items-center gap-3">
-            <Button className="ml-auto" variant="outline" onClick={onNewClick}>
-              <Plus
-                className="-ms-1 me-2 opacity-60"
-                size={16}
-                strokeWidth={2}
-                aria-hidden="true"
-              />
-              {newButtonText || "New item"}
-            </Button>
-          </div>
+          <Authorize roles={["ADMIN"]}>
+            <div className="flex items-center gap-3">
+              <Button
+                className="ml-auto"
+                variant="outline"
+                onClick={onNewClick}
+              >
+                <Plus
+                  className="-ms-1 me-2 opacity-60"
+                  size={16}
+                  strokeWidth={2}
+                  aria-hidden="true"
+                />
+                {newButtonText || "New item"}
+              </Button>
+            </div>
+          </Authorize>
         )}
       </div>
 

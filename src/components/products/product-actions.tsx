@@ -10,6 +10,7 @@ import { Ellipsis, Eye, Pencil, Trash } from "lucide-react"
 import { ProductDialog } from "../products/product-dialog"
 import { useState } from "react"
 import { type RouterOutputs } from "@/trpc/react"
+import { Authorize } from "../authorize"
 
 type Product = RouterOutputs["product"]["getProducts"][0]
 
@@ -23,7 +24,7 @@ export function ProductActions({ product }: { product: Product }) {
   }
 
   return (
-    <>
+    <Authorize roles={["ADMIN"]}>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <div className="flex justify-end">
@@ -62,6 +63,6 @@ export function ProductActions({ product }: { product: Product }) {
         open={open}
         onOpenChange={setOpen}
       />
-    </>
+    </Authorize>
   )
 }

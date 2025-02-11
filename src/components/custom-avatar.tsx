@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation"
 import { ChevronDown, LogOut, User } from "lucide-react"
 import { Session } from "next-auth"
 import { Badge } from "@/components/ui/badge"
+import { Authorize } from "@/components/authorize"
 
 export default function CustomAvatar({ session }: { session: Session | null }) {
   const router = useRouter()
@@ -51,18 +52,18 @@ export default function CustomAvatar({ session }: { session: Session | null }) {
             <span className="truncate text-sm font-medium text-foreground">
               {session?.user.name}
             </span>
-            {session?.user.role === "ADMIN" && (
+            <Authorize roles={["ADMIN"]}>
               <Badge variant="secondary" className="text-[10px] font-medium">
                 ADMIN
               </Badge>
-            )}
+            </Authorize>
           </div>
           <span className="truncate text-xs font-normal text-muted-foreground">
             {session?.user.email}
           </span>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {session?.user.role === "ADMIN" && (
+        <Authorize roles={["ADMIN"]}>
           <DropdownMenuItem onClick={() => router.push("/users")}>
             <User
               size={16}
@@ -72,7 +73,7 @@ export default function CustomAvatar({ session }: { session: Session | null }) {
             />
             <span>Users</span>
           </DropdownMenuItem>
-        )}
+        </Authorize>
         <DropdownMenuItem onClick={handleSignOut}>
           <LogOut
             size={16}

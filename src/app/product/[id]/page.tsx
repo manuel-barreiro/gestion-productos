@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/tooltip"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { QRCode } from "@/components/products/qr-code"
+import { Authorize } from "@/components/authorize"
 
 export default async function ProductPage({
   params,
@@ -37,6 +38,7 @@ export default async function ProductPage({
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="text-2xl font-bold">{product.name}</CardTitle>
+
             <ProductActions product={product} />
           </div>
         </CardHeader>
