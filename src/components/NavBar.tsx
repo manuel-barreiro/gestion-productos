@@ -1,8 +1,12 @@
+"use client"
+
 import CustomAvatar from "./custom-avatar"
-import { Session } from "next-auth"
+import { useSession } from "next-auth/react" // Add this
 import ToggleTheme from "./theme/theme-toggle"
 
-export function Navbar({ session }: { session: Session | null }) {
+export function Navbar() {
+  const { data: session } = useSession() // Add this
+
   return (
     <nav className="mx-auto max-w-5xl border-b border-gray-200">
       <div className="flex h-16 items-center px-4 sm:px-0">

@@ -8,6 +8,7 @@ import { ThemeProvider } from "@/components/theme/theme-provider"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { Navbar } from "@/components/NavBar"
 import { auth } from "@/server/auth"
+import { SessionProvider } from "next-auth/react"
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -27,17 +28,19 @@ export default async function RootLayout({
     >
       <body>
         <TRPCReactProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <TooltipProvider>
-              <Navbar session={session} />
-              {children}
-            </TooltipProvider>
-          </ThemeProvider>
+          <SessionProvider session={session}>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              <TooltipProvider>
+                <Navbar />
+                {children}
+              </TooltipProvider>
+            </ThemeProvider>
+          </SessionProvider>
         </TRPCReactProvider>
       </body>
     </html>
