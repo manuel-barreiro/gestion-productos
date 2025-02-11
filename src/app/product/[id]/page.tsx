@@ -17,10 +17,11 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 export default async function ProductPage({
   params,
 }: {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }) {
+  const id = (await params).id
   const session = await auth()
-  const product = await api.product.getById({ id: Number(params.id) })
+  const product = await api.product.getById({ id: Number(id) })
 
   if (!product) {
     notFound()
