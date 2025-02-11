@@ -11,17 +11,25 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { signIn } from "next-auth/react"
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { LoaderCircle } from "lucide-react"
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
-  const router = useRouter()
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState<boolean>(false)
+  const searchParams = useSearchParams()
+
+  // Add useEffect to handle URL error parameter
+  useEffect(() => {
+    const error = searchParams.get("error")
+    if (error === "CredentialsSignin") {
+      setError("Invalid email or password")
+    }
+  }, [searchParams])
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     setLoading(true)
@@ -33,19 +41,12 @@ export function LoginForm({
     const password = formData.get("password") as string
 
     try {
-      const result = await signIn("credentials", {
+      await signIn("credentials", {
         email,
         password,
-        redirect: false,
+        redirect: true,
+        callbackUrl: "/",
       })
-
-      if (result?.error) {
-        setError("Invalid email or password")
-        return
-      }
-
-      router.refresh()
-      router.push("/") // Or wherever you want to redirect after login
     } catch (error) {
       setError("Something went wrong. Please try again.")
     } finally {
