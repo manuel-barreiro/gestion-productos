@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label"
 import { signIn } from "next-auth/react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { LoaderCircle } from "lucide-react"
 
 export function LoginForm({
   className,
@@ -20,8 +21,10 @@ export function LoginForm({
 }: React.ComponentPropsWithoutRef<"div">) {
   const router = useRouter()
   const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState<boolean>(false)
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    setLoading(true)
     e.preventDefault()
     setError(null)
 
@@ -45,6 +48,8 @@ export function LoginForm({
       router.push("/") // Or wherever you want to redirect after login
     } catch (error) {
       setError("Something went wrong. Please try again.")
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -75,8 +80,15 @@ export function LoginForm({
                 <Input id="password" name="password" type="password" required />
               </div>
               {error && <div className="text-sm text-red-500">{error}</div>}
-              <Button type="submit" className="w-full">
-                Login
+              <Button disabled={loading} type="submit" className="w-full">
+                {loading ? (
+                  <div className="flex items-center gap-2">
+                    <LoaderCircle className="animate-spin" size={16} />
+                    Signing you in...
+                  </div>
+                ) : (
+                  "Login"
+                )}
               </Button>
             </div>
           </form>

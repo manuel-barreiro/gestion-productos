@@ -1,6 +1,5 @@
 "use client"
 
-import { useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -11,7 +10,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import { api } from "@/trpc/react"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
@@ -26,9 +24,9 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { type RouterOutputs } from "@/trpc/react"
-import { RichTextEditor } from "./rich-text-editor"
 import { MinimalTiptapEditor } from "../minimal-tiptap"
 import { cn } from "@/lib/utils"
+import { LoaderCircle } from "lucide-react"
 
 type Product = RouterOutputs["product"]["getProducts"][0]
 
@@ -88,7 +86,7 @@ export function ProductDialog({
   const deleteProduct = api.product.delete.useMutation({
     onSuccess: () => {
       onOpenChange(false)
-      router.refresh()
+      router.push("/")
     },
   })
 
@@ -145,7 +143,14 @@ export function ProductDialog({
               disabled={deleteProduct.isPending}
               onClick={() => deleteProduct.mutate({ id: product!.id })}
             >
-              {deleteProduct.isPending ? "Deleting..." : "Delete"}
+              {deleteProduct.isPending ? (
+                <div className="flex items-center gap-2">
+                  <LoaderCircle className="h-4 w-4 animate-spin" />
+                  Deleting...
+                </div>
+              ) : (
+                "Delete"
+              )}
             </Button>
           </DialogFooter>
         ) : (
@@ -195,13 +200,16 @@ export function ProductDialog({
                   type="submit"
                   disabled={(!isDirty && !isCreateMode) || isPending}
                 >
-                  {isPending
-                    ? isCreateMode
-                      ? "Creating..."
-                      : "Saving..."
-                    : isCreateMode
-                      ? "Create product"
-                      : "Save changes"}
+                  {isPending ? (
+                    <div className="flex items-center gap-2">
+                      <LoaderCircle className="h-4 w-4 animate-spin" />
+                      {isCreateMode ? "Creating..." : "Saving..."}
+                    </div>
+                  ) : isCreateMode ? (
+                    "Create product"
+                  ) : (
+                    "Save changes"
+                  )}
                 </Button>
               </DialogFooter>
             </form>
