@@ -25,6 +25,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import {
+  ColumnDef,
   ColumnFiltersState,
   PaginationState,
   SortingState,
@@ -44,29 +45,38 @@ import {
   ChevronRight,
   ChevronUp,
   CircleX,
-  Columns3,
   ListFilter,
   Plus,
   SlidersHorizontal,
 } from "lucide-react"
 import { useId, useRef, useState } from "react"
-import { columns } from "./columns"
-import { type RouterOutputs } from "@/trpc/react"
-import { ProductDialog } from "../products/product-dialog"
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuTrigger,
-} from "../ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu"
 
-type Product = RouterOutputs["product"]["getProducts"][0]
+interface DataTableProps<TData> {
+  data: TData[]
+  columns: ColumnDef<TData>[]
+  filterColumn?: string
+  filterPlaceholder?: string
+  onNewClick?: () => void
+  newButtonText?: string
+}
 
-export default function DataTable({ products }: { products: Product[] }) {
+export default function DataTable<TData>({
+  data,
+  columns,
+  filterColumn = "name",
+  filterPlaceholder = "Filter by name...",
+  onNewClick,
+  newButtonText,
+}: DataTableProps<TData>) {
   const id = useId()
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-  // const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
@@ -75,16 +85,14 @@ export default function DataTable({ products }: { products: Product[] }) {
 
   const [sorting, setSorting] = useState<SortingState>([
     {
-      id: "name",
+      id: filterColumn,
       desc: false,
     },
   ])
 
-  const [dialogOpen, setDialogOpen] = useState(false)
-
   // Table instance
   const table = useReactTable({
-    data: products ?? [],
+    data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -93,14 +101,12 @@ export default function DataTable({ products }: { products: Product[] }) {
     getPaginationRowModel: getPaginationRowModel(),
     onPaginationChange: setPagination,
     onColumnFiltersChange: setColumnFilters,
-    // onColumnVisibilityChange: setColumnVisibility,
     getFilteredRowModel: getFilteredRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
     state: {
       sorting,
       pagination,
       columnFilters,
-      // columnVisibility,
     },
   })
 
@@ -109,34 +115,36 @@ export default function DataTable({ products }: { products: Product[] }) {
       {/* Filters */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          {/* Filter by name or email */}
+          {/* Filter by column */}
           <div className="relative">
             <Input
               id={`${id}-input`}
               ref={inputRef}
               className={cn(
                 "peer min-w-60 ps-9",
-                Boolean(table.getColumn("name")?.getFilterValue()) && "pe-9"
+                Boolean(table.getColumn(filterColumn)?.getFilterValue()) &&
+                  "pe-9"
               )}
               value={
-                (table.getColumn("name")?.getFilterValue() ?? "") as string
+                (table.getColumn(filterColumn)?.getFilterValue() ??
+                  "") as string
               }
               onChange={(e) =>
-                table.getColumn("name")?.setFilterValue(e.target.value)
+                table.getColumn(filterColumn)?.setFilterValue(e.target.value)
               }
-              placeholder="Filter by name..."
+              placeholder={filterPlaceholder}
               type="text"
-              aria-label="Filter by name"
+              aria-label={filterPlaceholder}
             />
             <div className="pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 text-muted-foreground/80 peer-disabled:opacity-50">
               <ListFilter size={16} strokeWidth={2} aria-hidden="true" />
             </div>
-            {Boolean(table.getColumn("name")?.getFilterValue()) && (
+            {Boolean(table.getColumn(filterColumn)?.getFilterValue()) && (
               <button
                 className="absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-lg text-muted-foreground/80 outline-offset-2 transition-colors hover:text-foreground focus:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring/70 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
                 aria-label="Clear filter"
                 onClick={() => {
-                  table.getColumn("name")?.setFilterValue("")
+                  table.getColumn(filterColumn)?.setFilterValue("")
                   if (inputRef.current) {
                     inputRef.current.focus()
                   }
@@ -183,29 +191,23 @@ export default function DataTable({ products }: { products: Product[] }) {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        <div className="flex items-center gap-3">
-          {/* Add user button */}
-          <Button
-            className="ml-auto"
-            variant="outline"
-            onClick={() => {
-              setDialogOpen(true)
-            }}
-          >
-            <Plus
-              className="-ms-1 me-2 opacity-60"
-              size={16}
-              strokeWidth={2}
-              aria-hidden="true"
-            />
-            New product
-          </Button>
-        </div>
+        {onNewClick && (
+          <div className="flex items-center gap-3">
+            <Button className="ml-auto" variant="outline" onClick={onNewClick}>
+              <Plus
+                className="-ms-1 me-2 opacity-60"
+                size={16}
+                strokeWidth={2}
+                aria-hidden="true"
+              />
+              {newButtonText || "New item"}
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Table */}
       <div className="w-full overflow-x-auto [&>div]:max-h-[400px]">
-        {" "}
         <Table className="border-separate border-spacing-0 [&_td]:border-border [&_tfoot_td]:border-t [&_th]:border-b [&_th]:border-border [&_tr:not(:last-child)_td]:border-b [&_tr]:border-none">
           <TableHeader className="sticky top-0 z-10 bg-background/90 backdrop-blur-sm">
             {table.getHeaderGroups().map((headerGroup) => (
@@ -225,7 +227,6 @@ export default function DataTable({ products }: { products: Product[] }) {
                           )}
                           onClick={header.column.getToggleSortingHandler()}
                           onKeyDown={(e) => {
-                            // Enhanced keyboard handling for sorting
                             if (
                               header.column.getCanSort() &&
                               (e.key === "Enter" || e.key === " ")
@@ -360,7 +361,6 @@ export default function DataTable({ products }: { products: Product[] }) {
         <div>
           <Pagination>
             <PaginationContent>
-              {/* First page button */}
               <PaginationItem>
                 <Button
                   size="icon"
@@ -373,7 +373,6 @@ export default function DataTable({ products }: { products: Product[] }) {
                   <ChevronFirst size={16} strokeWidth={2} aria-hidden="true" />
                 </Button>
               </PaginationItem>
-              {/* Previous page button */}
               <PaginationItem>
                 <Button
                   size="icon"
@@ -386,7 +385,6 @@ export default function DataTable({ products }: { products: Product[] }) {
                   <ChevronLeft size={16} strokeWidth={2} aria-hidden="true" />
                 </Button>
               </PaginationItem>
-              {/* Next page button */}
               <PaginationItem>
                 <Button
                   size="icon"
@@ -399,7 +397,6 @@ export default function DataTable({ products }: { products: Product[] }) {
                   <ChevronRight size={16} strokeWidth={2} aria-hidden="true" />
                 </Button>
               </PaginationItem>
-              {/* Last page button */}
               <PaginationItem>
                 <Button
                   size="icon"
@@ -416,12 +413,6 @@ export default function DataTable({ products }: { products: Product[] }) {
           </Pagination>
         </div>
       </div>
-
-      <ProductDialog
-        mode={"create"}
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-      />
     </div>
   )
 }

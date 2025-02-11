@@ -1,8 +1,9 @@
+"use client"
 import { ColumnDef, FilterFn, Row } from "@tanstack/react-table"
 import { Eye } from "lucide-react"
 import { type RouterOutputs } from "@/trpc/react"
 import Link from "next/link"
-import { QRCode } from "../products/qr-code"
+import { QRCode } from "./qr-code"
 
 type Product = RouterOutputs["product"]["getProducts"][0]
 
@@ -35,7 +36,6 @@ export const columns: ColumnDef<Product>[] = [
         href={`/product/${row.getValue("id")}`}
         className="group flex items-center gap-2 font-medium transition-all duration-200 hover:text-blue-500"
       >
-        <Eye className="hidden h-4 w-4 transition-opacity duration-200 group-hover:block" />
         <span className="border-b border-transparent hover:border-blue-500">
           {row.getValue("name")}
         </span>

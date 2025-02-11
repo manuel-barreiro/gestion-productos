@@ -1,8 +1,5 @@
 import { api } from "@/trpc/server"
 import { notFound } from "next/navigation"
-import { QRCodeSVG } from "qrcode.react"
-import { Navbar } from "@/components/NavBar"
-import { auth } from "@/server/auth"
 import { SafeHTMLRenderer } from "@/components/safe-html-renderer"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
@@ -35,7 +32,7 @@ export default async function ProductPage({
   }
 
   return (
-    <main className="container mx-auto max-w-5xl p-4">
+    <main className="container mx-auto mt-4 max-w-5xl">
       <Card className="overflow-hidden">
         <CardHeader>
           <div className="flex items-center justify-between">

@@ -5,6 +5,8 @@ export default auth((req) => {
   const { nextUrl } = req
   const isLoggedIn = !!req.auth
   const isAuthPage = nextUrl.pathname === "/sign-in"
+  const isAdminPage = nextUrl.pathname === "/users"
+  const isAdmin = req.auth?.user?.role === "ADMIN"
 
   // Skip middleware for API routes
   if (nextUrl.pathname.startsWith("/api")) {
@@ -19,6 +21,11 @@ export default auth((req) => {
   // If not logged in and trying to access /, redirect to /sign-in
   if (!isLoggedIn && nextUrl.pathname === "/") {
     return NextResponse.redirect(new URL("/sign-in", nextUrl))
+  }
+
+  // If not admin and trying to access /users, redirect to home
+  if (isAdminPage && !isAdmin) {
+    return NextResponse.redirect(new URL("/", nextUrl))
   }
 
   return NextResponse.next()

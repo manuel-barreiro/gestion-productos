@@ -10,11 +10,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { signOut } from "next-auth/react"
-
-import { ChevronDown, LogOut } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { ChevronDown, LogOut, User } from "lucide-react"
 import { Session } from "next-auth"
 
 export default function CustomAvatar({ session }: { session: Session | null }) {
+  const router = useRouter()
   const handleSignOut = async () => {
     await signOut({
       redirectTo: "/sign-in",
@@ -53,6 +54,17 @@ export default function CustomAvatar({ session }: { session: Session | null }) {
           </span>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        {session?.user.role === "ADMIN" && (
+          <DropdownMenuItem onClick={() => router.push("/users")}>
+            <User
+              size={16}
+              strokeWidth={2}
+              className="opacity-60"
+              aria-hidden="true"
+            />
+            <span>Users</span>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem onClick={handleSignOut}>
           <LogOut
             size={16}
