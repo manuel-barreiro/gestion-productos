@@ -1,18 +1,8 @@
 import { ColumnDef, FilterFn, Row } from "@tanstack/react-table"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Button } from "../ui/button"
-import { Ellipsis, Eye, Pencil, Trash } from "lucide-react"
+import { Eye } from "lucide-react"
 import { type RouterOutputs } from "@/trpc/react"
-import { ProductDialog } from "../products/product-dialog"
-import { useState } from "react"
-import { QRCodeSVG } from "qrcode.react"
 import Link from "next/link"
-import { SafeHTMLRenderer } from "../safe-html-renderer"
+import { QRCode } from "../products/qr-code"
 
 type Product = RouterOutputs["product"]["getProducts"][0]
 
@@ -70,12 +60,7 @@ export const columns: ColumnDef<Product>[] = [
     id: "qrcode",
     cell: ({ row }) => (
       <div className="inline-block rounded-md bg-white p-1">
-        <QRCodeSVG
-          value={`${window.location.origin}/product/${row.getValue("id")}`}
-          size={60}
-          bgColor="#FFFFFF"
-          fgColor="#000000"
-        />
+        <QRCode path={`/product/${row.getValue("id")}`} size={60} />
       </div>
     ),
     size: 60,

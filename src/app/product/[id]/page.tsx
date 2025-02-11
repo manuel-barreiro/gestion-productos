@@ -13,6 +13,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { QRCode } from "@/components/products/qr-code"
 
 export default async function ProductPage({
   params,
@@ -55,12 +56,7 @@ export default async function ProductPage({
             <div className="md:col-span-2">
               <div className="flex flex-col items-center space-y-4">
                 <div className="rounded-xl bg-white p-4 shadow-sm">
-                  <QRCodeSVG
-                    value={`${process.env.NEXT_PUBLIC_APP_URL}/product/${product.id}`}
-                    size={200}
-                    level="H"
-                    includeMargin={true}
-                  />
+                  <QRCode path={`/product/${product.id}`} />
                 </div>
               </div>
             </div>
