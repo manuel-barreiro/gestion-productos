@@ -47,7 +47,7 @@ export default async function ProductPage({
           <div className="grid gap-8 md:grid-cols-5">
             {/* Main Content - Takes up 3 columns */}
             <div className="space-y-6 md:col-span-3">
-              <div className="rounded-lg bg-gray-50 sm:p-4">
+              <div className="rounded-lg">
                 <SafeHTMLRenderer htmlContent={product.ingredients} />
               </div>
             </div>

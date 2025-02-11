@@ -20,7 +20,7 @@ export function SafeHTMLRenderer({ htmlContent }: SafeHTMLRendererProps) {
 
   return (
     <div
-      className="prose prose-sm max-w-none"
+      className="prose prose-sm max-w-none text-justify dark:prose-invert"
       dangerouslySetInnerHTML={{ __html: sanitizedContent }}
     />
   )
