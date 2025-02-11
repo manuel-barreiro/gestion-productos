@@ -6,6 +6,8 @@ import { type Metadata } from "next"
 import { TRPCReactProvider } from "@/trpc/react"
 import { ThemeProvider } from "@/components/theme/theme-provider"
 import { TooltipProvider } from "@/components/ui/tooltip"
+import { Navbar } from "@/components/NavBar"
+import { auth } from "@/server/auth"
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -13,9 +15,10 @@ export const metadata: Metadata = {
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const session = await auth()
   return (
     <html
       lang="en"
@@ -30,7 +33,10 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <TooltipProvider>{children}</TooltipProvider>
+            <TooltipProvider>
+              <Navbar session={session} />
+              {children}
+            </TooltipProvider>
           </ThemeProvider>
         </TRPCReactProvider>
       </body>

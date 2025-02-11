@@ -204,7 +204,7 @@ export default function DataTable({ products }: { products: Product[] }) {
       </div>
 
       {/* Table */}
-      <div className="w-full overflow-x-auto [&>div]:max-h-96">
+      <div className="w-full overflow-x-auto [&>div]:max-h-[400px]">
         {" "}
         <Table className="border-separate border-spacing-0 [&_td]:border-border [&_tfoot_td]:border-t [&_th]:border-b [&_th]:border-border [&_tr:not(:last-child)_td]:border-b [&_tr]:border-none">
           <TableHeader className="sticky top-0 z-10 bg-background/90 backdrop-blur-sm">
