@@ -20,7 +20,13 @@ export const columns: ColumnDef<User>[] = [
         <div className="flex items-center gap-3">
           <Avatar className="h-8 w-8">
             <AvatarImage src={image ?? undefined} alt={name ?? "Avatar"} />
-            <AvatarFallback>{name?.charAt(0).toUpperCase()}</AvatarFallback>
+            <AvatarFallback>
+              {name
+                ?.split(" ")
+                .map((n) => n[0])
+                .join("")
+                .toUpperCase() ?? "U"}
+            </AvatarFallback>
           </Avatar>
           <div className="flex flex-col">
             <span className="font-medium">{name}</span>
@@ -36,7 +42,10 @@ export const columns: ColumnDef<User>[] = [
     cell: ({ row }) => {
       const role = row.getValue("role") as string
       return (
-        <Badge variant={role === "ADMIN" ? "destructive" : "secondary"}>
+        <Badge
+          className="text-[10px] font-medium"
+          variant={role === "ADMIN" ? "destructive" : "secondary"}
+        >
           {role}
         </Badge>
       )

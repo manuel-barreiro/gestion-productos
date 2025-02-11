@@ -13,6 +13,7 @@ import { signOut } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { ChevronDown, LogOut, User } from "lucide-react"
 import { Session } from "next-auth"
+import { Badge } from "@/components/ui/badge"
 
 export default function CustomAvatar({ session }: { session: Session | null }) {
   const router = useRouter()
@@ -46,9 +47,16 @@ export default function CustomAvatar({ session }: { session: Session | null }) {
       </DropdownMenuTrigger>
       <DropdownMenuContent className="max-w-64">
         <DropdownMenuLabel className="flex min-w-0 flex-col">
-          <span className="truncate text-sm font-medium text-foreground">
-            {session?.user.name}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="truncate text-sm font-medium text-foreground">
+              {session?.user.name}
+            </span>
+            {session?.user.role === "ADMIN" && (
+              <Badge variant="secondary" className="text-[10px] font-medium">
+                ADMIN
+              </Badge>
+            )}
+          </div>
           <span className="truncate text-xs font-normal text-muted-foreground">
             {session?.user.email}
           </span>
